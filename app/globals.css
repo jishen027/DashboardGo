@@ -1,0 +1,58 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-[#FBFBF9] text-[#1A1A1A];
+  }
+}
+
+@layer components {
+  .tech-badge {
+    @apply inline-flex items-center font-mono text-[10px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded bg-stone-100 text-stone-700 border border-stone-200;
+  }
+
+  .tech-label {
+    @apply block font-mono text-xs uppercase tracking-wider text-stone-500 font-semibold mb-1;
+  }
+
+  .tech-value {
+    @apply font-mono font-black text-[#1A1A1A] tracking-tight leading-none;
+  }
+}
+
+@layer utilities {
+  .bg-grid-pattern {
+    background-image:
+      linear-gradient(to right, rgba(0,0,0,0.04) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(0,0,0,0.04) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+
+  .bg-dot-pattern {
+    background-image: radial-gradient(rgba(0,0,0,0.08) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+
+  .shadow-card {
+    box-shadow: 0 1px 3px 0 rgba(0,0,0,0.07), 0 1px 2px -1px rgba(0,0,0,0.04);
+  }
+
+  .shadow-hover {
+    box-shadow: 0 4px 12px 0 rgba(0,0,0,0.10), 0 2px 4px -1px rgba(0,0,0,0.06);
+  }
+
+  .shadow-overlay {
+    box-shadow: 0 10px 40px 0 rgba(0,0,0,0.14), 0 4px 12px -2px rgba(0,0,0,0.08);
+  }
+}
