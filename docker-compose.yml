@@ -6,8 +6,9 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      # Config persists across deployments on the host at /opt/dashboardgo/
-      - /opt/dashboardgo/dashy-config.json:/app/dashy-config.json
+      # Named volume — Docker initialises it from the image's /app/config/ on
+      # first creation and persists all subsequent edits across restarts/redeploys.
+      - dashboardgo_config:/app/config
     environment:
       - NODE_ENV=production
       - NEXT_TELEMETRY_DISABLED=1
@@ -17,3 +18,6 @@ services:
       timeout: 10s
       retries: 3
       start_period: 15s
+
+volumes:
+  dashboardgo_config:

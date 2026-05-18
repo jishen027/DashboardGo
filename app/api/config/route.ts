@@ -4,7 +4,7 @@ import { join } from 'path';
 import type { DashyConfig } from '@/types';
 import { DEFAULT_DASHY_CONFIG } from '@/data/defaultConfig';
 
-const CONFIG_PATH = join(process.cwd(), 'dashy-config.json');
+const CONFIG_PATH = join(process.cwd(), 'config', 'dashy-config.json');
 
 export async function GET() {
   try {
