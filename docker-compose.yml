@@ -1,0 +1,19 @@
+services:
+  dashboardgo:
+    image: dashboardgo:latest
+    container_name: dashboardgo
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      # Config persists across deployments on the host at /opt/dashboardgo/
+      - /opt/dashboardgo/dashy-config.json:/app/dashy-config.json
+    environment:
+      - NODE_ENV=production
+      - NEXT_TELEMETRY_DISABLED=1
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/api/config"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s

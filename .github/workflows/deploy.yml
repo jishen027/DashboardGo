@@ -1,0 +1,77 @@
+name: Deploy DashboardGo
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Build & Deploy
+    runs-on: self-hosted
+    timeout-minutes: 20
+
+    steps:
+      # ── 1. Source ─────────────────────────────────────────────────────────────
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ── 2. Docker layer cache (persisted between runs on the self-hosted runner)
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          driver-opts: network=host
+
+      - name: Build image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          tags: dashboardgo:latest
+          load: true
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
+
+      # Rotate cache so it never grows unboundedly
+      - name: Rotate build cache
+        run: |
+          rm -rf /tmp/.buildx-cache
+          mv /tmp/.buildx-cache-new /tmp/.buildx-cache
+
+      # ── 3. Seed config on first deploy (never overwrites existing data) ───────
+      - name: Initialise persistent config
+        run: |
+          mkdir -p /opt/dashboardgo
+          if [ ! -f /opt/dashboardgo/dashy-config.json ]; then
+            cp dashy-config.example.json /opt/dashboardgo/dashy-config.json
+            echo "Created /opt/dashboardgo/dashy-config.json from example."
+          else
+            echo "Existing config found — skipping seed."
+          fi
+
+      # ── 4. Deploy ─────────────────────────────────────────────────────────────
+      - name: Deploy container
+        run: |
+          docker compose down --remove-orphans --timeout 10
+          docker compose up -d
+
+      # ── 5. Health check ───────────────────────────────────────────────────────
+      - name: Wait for healthy container
+        run: |
+          echo "Waiting for container to become healthy..."
+          for i in $(seq 1 12); do
+            STATUS=$(docker inspect --format='{{.State.Health.Status}}' dashboardgo 2>/dev/null || echo "missing")
+            echo "  attempt $i: $STATUS"
+            if [ "$STATUS" = "healthy" ]; then
+              echo "Container is healthy."
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "Container did not become healthy in time."
+          docker logs dashboardgo --tail 50
+          exit 1
+
+      # ── 6. Prune old images ───────────────────────────────────────────────────
+      - name: Remove dangling images
+        if: always()
+        run: docker image prune -f
