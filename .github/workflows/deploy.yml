@@ -44,19 +44,18 @@ jobs:
           docker compose up -d
 
       # ── 5. Health check ───────────────────────────────────────────────────────
-      - name: Wait for healthy container
+      - name: Wait for application to respond
         run: |
-          echo "Waiting for container to become healthy..."
-          for i in $(seq 1 12); do
-            STATUS=$(docker inspect --format='{{.State.Health.Status}}' dashboardgo 2>/dev/null || echo "missing")
-            echo "  attempt $i: $STATUS"
-            if [ "$STATUS" = "healthy" ]; then
-              echo "Container is healthy."
+          echo "Waiting for application to respond on port 3000..."
+          for i in $(seq 1 24); do
+            if wget -q --spider --timeout=5 http://localhost:3000/api/config 2>/dev/null; then
+              echo "Application is responding (attempt $i)."
               exit 0
             fi
+            echo "  attempt $i: not ready yet"
             sleep 5
           done
-          echo "Container did not become healthy in time."
+          echo "Application did not respond within 2 minutes."
           docker logs dashboardgo --tail 50
           exit 1
 
