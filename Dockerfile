@@ -34,9 +34,9 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 # Static assets served by Next.js
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static   ./.next/static
 
-# Default config — mount a volume here to persist edits across restarts:
-#   docker run -v ./dashy-config.json:/app/dashy-config.json ...
-COPY --from=builder --chown=nextjs:nodejs /app/dashy-config.json ./dashy-config.json
+# Bake in the example config as the default.
+# The compose volume mount overlays this with the host's persistent file at runtime.
+COPY --from=builder --chown=nextjs:nodejs /app/dashy-config.example.json ./dashy-config.json
 
 USER nextjs
 EXPOSE 3000
