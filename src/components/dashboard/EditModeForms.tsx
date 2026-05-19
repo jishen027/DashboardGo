@@ -64,7 +64,7 @@ export function EditModeForms({ sections, onAddSection, onAddHost }: EditModeFor
       <Card variant="base" className="border-amber-400 dark:border-amber-600">
         <Heading level={3} className="mb-3">📍 Fast Node Register</Heading>
         <form onSubmit={handleHostSubmit} className="space-y-3 text-xs">
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             <TextInput placeholder="Application Name" value={host.name} onChange={setField('name')} required />
             <Select
               options={sections.map((s) => ({ value: s.id, label: s.name }))}
@@ -72,12 +72,12 @@ export function EditModeForms({ sections, onAddSection, onAddHost }: EditModeFor
               onChange={setField('sectionId')}
             />
           </div>
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
             <TextInput placeholder="Port" value={host.port} onChange={setField('port')} />
             <TextInput placeholder="Icon (Emoji)" value={host.icon} onChange={setField('icon')} />
             <TextInput placeholder="Tags (comma-separated)" value={host.tags} onChange={setField('tags')} />
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2">
             <div className="flex-1">
               <TextInput placeholder="Endpoint redirection URL" value={host.url} onChange={setField('url')} required />
             </div>

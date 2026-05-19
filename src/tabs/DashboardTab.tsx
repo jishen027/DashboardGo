@@ -1,13 +1,12 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import { Search } from 'lucide-react';
 import { WidgetGrid } from '@/components/dashboard/WidgetGrid';
-import { SearchBar } from '@/components/dashboard/SearchBar';
 import { DensityControls } from '@/components/dashboard/DensityControls';
 import { EditModeForms } from '@/components/dashboard/EditModeForms';
 import { ServiceSection } from '@/components/dashboard/ServiceSection';
 import { Heading } from '@/components/ui/Heading';
 import { Body } from '@/components/ui/Body';
-import type { DashyConfig, LayoutDensity, NewHostForm, StatusCounts, ToastType } from '@/types';
+import type { DashyConfig, LayoutDensity, NewHostForm, StatusCounts } from '@/types';
 
 interface DashboardTabProps {
   config: DashyConfig;
@@ -26,8 +25,6 @@ interface DashboardTabProps {
   onDeleteItem: (sectionId: string, itemId: string, itemName: string) => void;
   onAddSection: (title: string) => void;
   onAddHost: (form: NewHostForm) => void;
-  onSearch: (query: string, provider: string) => void;
-  showToastFn: (message: string, type?: ToastType) => void;
 }
 
 export function DashboardTab({
@@ -35,38 +32,13 @@ export function DashboardTab({
   currentTime, simSpeed, simLatency,
   onPingItem, onPingSectionAll, onMoveSectionUp, onMoveSectionDown,
   onMoveItemUp, onMoveItemDown, onDeleteItem, onAddSection, onAddHost,
-  onSearch, showToastFn,
 }: DashboardTabProps) {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedProvider, setSelectedProvider] = useState(config.searchProvider);
   const [density, setDensity] = useState<LayoutDensity>(config.layoutDensity);
   const [editMode, setEditMode] = useState(false);
   const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({});
-  const searchInputRef = useRef<HTMLInputElement>(null);
-
-  // Ctrl+K keyboard shortcut
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === 'k' && (e.ctrlKey || e.metaKey)) {
-        e.preventDefault();
-        searchInputRef.current?.focus();
-        showToastFn('Search focused! Press enter to search web or filter local services.', 'stone');
-      }
-    };
-    window.addEventListener('keydown', handler);
-    return () => window.removeEventListener('keydown', handler);
-  }, [showToastFn]);
 
   const toggleCollapse = (id: string) =>
     setCollapsedSections((prev) => ({ ...prev, [id]: !prev[id] }));
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!searchQuery) return;
-    onSearch(searchQuery, selectedProvider);
-  };
-
-  const filteredCount = filteredSections.reduce((sum, s) => sum + s.items.length, 0);
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -75,18 +47,6 @@ export function DashboardTab({
         statusCounts={statusCounts}
         simSpeed={simSpeed}
         simLatency={simLatency}
-      />
-
-      <SearchBar
-        searchQuery={searchQuery}
-        selectedProvider={selectedProvider}
-        searchEngines={config.searchEngines}
-        filteredCount={filteredCount}
-        inputRef={searchInputRef}
-        onQueryChange={setSearchQuery}
-        onProviderChange={setSelectedProvider}
-        onSearch={handleSearch}
-        onClear={() => setSearchQuery('')}
       />
 
       <DensityControls

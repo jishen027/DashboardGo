@@ -39,26 +39,26 @@ export function ServiceSection({
   return (
     <div className="space-y-3">
       {/* Section header */}
-      <div className="flex items-center justify-between border-b border-stone-200 dark:border-stone-800 pb-1.5">
-        <div className="flex items-center gap-3">
+      <div className="flex items-center justify-between border-b border-stone-200 dark:border-stone-800 pb-1.5 gap-2">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
           <button
             onClick={onToggleCollapse}
-            className="p-1 rounded text-stone-500 hover:text-stone-800 hover:bg-stone-100 dark:hover:bg-stone-800"
+            className="p-1 rounded text-stone-500 hover:text-stone-800 hover:bg-stone-100 dark:hover:bg-stone-800 shrink-0"
           >
             {isCollapsed ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
           </button>
-          <div>
-            <Heading level={2} className="text-lg md:text-xl flex items-center gap-2">
-              <span>{section.name}</span>
-              <Badge variant="stone" size="sm" className="font-mono text-[10px]">
+          <div className="min-w-0">
+            <Heading level={2} className="text-base sm:text-lg md:text-xl flex items-center gap-2 flex-wrap">
+              <span className="truncate">{section.name}</span>
+              <Badge variant="stone" size="sm" className="font-mono text-[10px] shrink-0">
                 {section.items.length} nodes
               </Badge>
             </Heading>
-            <Body size="xs" muted>{section.description}</Body>
+            <Body size="xs" muted className="truncate">{section.description}</Body>
           </div>
         </div>
 
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1 shrink-0">
           {editMode && (
             <div className="flex items-center gap-1 border-r border-stone-200 dark:border-stone-800 pr-2 mr-1">
               <IconButton size="sm" onClick={onMoveSectionUp} disabled={sectionIdx === 0} aria-label="Move Section Up">
@@ -76,7 +76,7 @@ export function ServiceSection({
             onClick={onPingSectionAll}
             iconLeft={<RefreshCw className="w-3 h-3" />}
           >
-            Diag Group
+            <span className="hidden sm:inline">Diag Group</span>
           </Button>
         </div>
       </div>

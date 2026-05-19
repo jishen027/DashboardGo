@@ -38,20 +38,12 @@ export interface ServiceSection {
   items: ServiceItem[];
 }
 
-export interface SearchEngine {
-  value: string;
-  label: string;
-  url: string;
-}
-
 export interface DashyConfig {
   serverName: string;
   serverIp: string;
   uptime: string;
-  searchProvider: string;
   layoutDensity: LayoutDensity;
   sections: ServiceSection[];
-  searchEngines: SearchEngine[];
 }
 
 export interface StatusCounts {

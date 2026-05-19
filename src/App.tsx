@@ -16,7 +16,6 @@ import type { ActiveTab } from '@/types';
 export default function App() {
   const [activeTab, setActiveTab] = useState<ActiveTab>('dashboard');
   const [darkMode, setDarkMode] = useState(false);
-  const [searchQuery] = useState('');
 
   const { toast, showToast } = useToast();
   const currentTime = useLiveClock();
@@ -41,15 +40,7 @@ export default function App() {
     handleAddHost,
     handleJsonChange,
     handleDownloadConfig,
-  } = useDashyConfig(showToast, searchQuery);
-
-  const handleSearch = (query: string, provider: string) => {
-    const engine = config.searchEngines.find((e) => e.value === provider);
-    if (engine) {
-      window.open(`${engine.url}${encodeURIComponent(query)}`, '_blank');
-      showToast(`Redirecting search query to ${engine.label}...`, 'success');
-    }
-  };
+  } = useDashyConfig(showToast);
 
   return (
     <div className={`min-h-screen transition-colors duration-300 bg-[#FBFBF9] dark:bg-[#121211] ${darkMode ? 'dark' : ''}`}>
@@ -65,7 +56,7 @@ export default function App() {
         onToggleDark={() => setDarkMode((v) => !v)}
       />
 
-      <main className="max-w-6xl mx-auto px-6 py-8 relative space-y-8">
+      <main className="max-w-6xl mx-auto px-3 sm:px-6 py-6 sm:py-8 relative space-y-8">
         {toast && <Toast toast={toast} />}
 
         {activeTab === 'dashboard' && (
@@ -86,8 +77,6 @@ export default function App() {
             onDeleteItem={deleteItem}
             onAddSection={handleAddSection}
             onAddHost={handleAddHost}
-            onSearch={handleSearch}
-            showToastFn={showToast}
           />
         )}
 

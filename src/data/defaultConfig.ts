@@ -4,7 +4,6 @@ export const DEFAULT_DASHY_CONFIG: DashyConfig = {
   serverName: 'Hiiragi Home Station',
   serverIp: '192.168.1.100',
   uptime: '42d 11h 12m',
-  searchProvider: 'duckduckgo',
   layoutDensity: 'medium',
   sections: [
     {
@@ -149,11 +148,5 @@ export const DEFAULT_DASHY_CONFIG: DashyConfig = {
         },
       ],
     },
-  ],
-  searchEngines: [
-    { value: 'duckduckgo', label: 'DuckDuckGo', url: 'https://duckduckgo.com/?q=' },
-    { value: 'google', label: 'Google', url: 'https://google.com/search?q=' },
-    { value: 'github', label: 'GitHub', url: 'https://github.com/search?q=' },
-    { value: 'wikipedia', label: 'Wikipedia', url: 'https://en.wikipedia.org/wiki/Special:Search?search=' },
   ],
 };

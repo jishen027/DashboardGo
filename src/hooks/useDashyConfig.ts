@@ -5,7 +5,7 @@ import { DEFAULT_DASHY_CONFIG } from '@/data/defaultConfig';
 type ShowToast = (message: string, type?: ToastType) => void;
 export type SyncStatus = 'idle' | 'saving' | 'saved' | 'error';
 
-export function useDashyConfig(showToast: ShowToast, searchQuery: string) {
+export function useDashyConfig(showToast: ShowToast) {
   const [config, setConfig] = useState<DashyConfig>(DEFAULT_DASHY_CONFIG);
   const [rawJsonText, setRawJsonText] = useState(
     JSON.stringify(DEFAULT_DASHY_CONFIG, null, 2)
@@ -71,24 +71,7 @@ export function useDashyConfig(showToast: ShowToast, searchQuery: string) {
     return { online, offline, paused, total };
   }, [config.sections]);
 
-  // ── Filtered sections ──────────────────────────────────────────────────────
-  const filteredSections = useMemo(() => {
-    if (!searchQuery) return config.sections;
-    return config.sections
-      .map((section) => ({
-        ...section,
-        items: section.items.filter((item) => {
-          const q = searchQuery.toLowerCase();
-          return (
-            item.name.toLowerCase().includes(q) ||
-            item.description.toLowerCase().includes(q) ||
-            String(item.port).includes(q) ||
-            item.tags.some((t) => t.toLowerCase().includes(q))
-          );
-        }),
-      }))
-      .filter((sec) => sec.items.length > 0);
-  }, [config.sections, searchQuery]);
+  const filteredSections = config.sections;
 
   // ── Ping ───────────────────────────────────────────────────────────────────
   const pingItem = useCallback(
