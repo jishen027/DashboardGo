@@ -1,12 +1,14 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Search } from 'lucide-react';
 import { WidgetGrid } from '@/components/dashboard/WidgetGrid';
 import { DensityControls } from '@/components/dashboard/DensityControls';
 import { EditModeForms } from '@/components/dashboard/EditModeForms';
 import { ServiceSection } from '@/components/dashboard/ServiceSection';
+import { FilterBar } from '@/components/dashboard/FilterBar';
 import { Heading } from '@/components/ui/Heading';
 import { Body } from '@/components/ui/Body';
-import type { DashyConfig, LayoutDensity, NewHostForm, StatusCounts } from '@/types';
+import type { DashyConfig, LayoutDensity, NewHostForm, StatusCounts, ServiceItem } from '@/types';
+import type { StatusFilter } from '@/components/dashboard/FilterBar';
 
 interface DashboardTabProps {
   config: DashyConfig;
@@ -27,6 +29,24 @@ interface DashboardTabProps {
   onAddHost: (form: NewHostForm) => void;
 }
 
+function matchesStatus(item: ServiceItem, statusFilter: StatusFilter): boolean {
+  if (statusFilter === 'all') return true;
+  if (statusFilter === 'online') return item.status === 'correct' || item.status === 'completed';
+  if (statusFilter === 'paused') return item.status === 'skipped';
+  return item.status !== 'correct' && item.status !== 'completed' && item.status !== 'skipped';
+}
+
+function matchesSearch(item: ServiceItem, query: string): boolean {
+  if (!query) return true;
+  const q = query.toLowerCase();
+  return (
+    item.name.toLowerCase().includes(q) ||
+    item.description.toLowerCase().includes(q) ||
+    item.url.toLowerCase().includes(q) ||
+    item.tags.some((t) => t.toLowerCase().includes(q))
+  );
+}
+
 export function DashboardTab({
   config, filteredSections, statusCounts, pingingId,
   currentTime, simSpeed, simLatency,
@@ -36,9 +56,25 @@ export function DashboardTab({
   const [density, setDensity] = useState<LayoutDensity>(config.layoutDensity);
   const [editMode, setEditMode] = useState(false);
   const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({});
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
 
   const toggleCollapse = (id: string) =>
     setCollapsedSections((prev) => ({ ...prev, [id]: !prev[id] }));
+
+  const displayedSections = useMemo(() => {
+    return filteredSections
+      .map((sec) => ({
+        ...sec,
+        items: sec.items.filter(
+          (item) => matchesStatus(item, statusFilter) && matchesSearch(item, searchQuery)
+        ),
+      }))
+      .filter((sec) => sec.items.length > 0);
+  }, [filteredSections, searchQuery, statusFilter]);
+
+  const totalNodes = filteredSections.reduce((sum, s) => sum + s.items.length, 0);
+  const totalVisible = displayedSections.reduce((sum, s) => sum + s.items.length, 0);
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -56,6 +92,15 @@ export function DashboardTab({
         onToggleEditMode={() => setEditMode((v) => !v)}
       />
 
+      <FilterBar
+        searchQuery={searchQuery}
+        statusFilter={statusFilter}
+        totalVisible={totalVisible}
+        totalNodes={totalNodes}
+        onSearchChange={setSearchQuery}
+        onStatusChange={setStatusFilter}
+      />
+
       {editMode && (
         <EditModeForms
           sections={config.sections}
@@ -65,7 +110,7 @@ export function DashboardTab({
       )}
 
       <div className="space-y-6">
-        {filteredSections.map((section, secIdx) => (
+        {displayedSections.map((section, secIdx) => (
           <ServiceSection
             key={section.id}
             section={section}
@@ -86,7 +131,7 @@ export function DashboardTab({
           />
         ))}
 
-        {filteredSections.length === 0 && (
+        {displayedSections.length === 0 && (
           <div className="text-center py-16 bg-stone-50 dark:bg-stone-900/40 border border-dashed rounded-lg border-stone-200 dark:border-stone-800">
             <Search className="w-8 h-8 mx-auto text-stone-400 mb-2" />
             <Heading level={3}>No Matching Nodes</Heading>
