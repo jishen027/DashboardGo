@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import { Search } from 'lucide-react';
 import { WidgetGrid } from '@/components/dashboard/WidgetGrid';
 import { DensityControls } from '@/components/dashboard/DensityControls';
@@ -59,6 +59,20 @@ export function DashboardTab({
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
 
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.key === 'k') {
+        e.preventDefault();
+        searchInputRef.current?.focus();
+        searchInputRef.current?.select();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   const toggleCollapse = (id: string) =>
     setCollapsedSections((prev) => ({ ...prev, [id]: !prev[id] }));
 
@@ -99,6 +113,7 @@ export function DashboardTab({
         totalNodes={totalNodes}
         onSearchChange={setSearchQuery}
         onStatusChange={setStatusFilter}
+        inputRef={searchInputRef}
       />
 
       {editMode && (

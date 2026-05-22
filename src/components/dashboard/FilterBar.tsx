@@ -10,6 +10,7 @@ interface FilterBarProps {
   totalNodes: number;
   onSearchChange: (q: string) => void;
   onStatusChange: (s: StatusFilter) => void;
+  inputRef?: React.RefObject<HTMLInputElement | null>;
 }
 
 const STATUS_OPTIONS: { label: string; value: StatusFilter; dot: string }[] = [
@@ -21,7 +22,7 @@ const STATUS_OPTIONS: { label: string; value: StatusFilter; dot: string }[] = [
 
 export function FilterBar({
   searchQuery, statusFilter, totalVisible, totalNodes,
-  onSearchChange, onStatusChange,
+  onSearchChange, onStatusChange, inputRef,
 }: FilterBarProps) {
   const isFiltering = searchQuery.trim() !== '' || statusFilter !== 'all';
 
@@ -31,8 +32,9 @@ export function FilterBar({
       <div className="relative flex-1 max-w-xs">
         <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-stone-400 pointer-events-none" />
         <input
+          ref={inputRef}
           type="text"
-          placeholder="Search nodes…"
+          placeholder="Search nodes… (Ctrl+K)"
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
           className="w-full pl-8 pr-7 py-1.5 text-xs bg-white dark:bg-[#1C1C1A] border border-stone-200 dark:border-stone-800 rounded focus:outline-none focus:ring-1 focus:ring-stone-400 dark:focus:ring-stone-600 text-[#1A1A1A] dark:text-stone-100 placeholder-stone-400"
