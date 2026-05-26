@@ -22,12 +22,16 @@ export async function GET(
   { params }: { params: Promise<{ action: string }> },
 ) {
   const { action } = await params;
-  const client = new LogtoClient(getLogtoConfig());
+  // Resolve config once per request. baseUrl comes from requireEnv() which uses
+  // bracket notation (process.env[name]) and is NOT inlined by Turbopack at
+  // build time — unlike a direct process.env.NEXT_PUBLIC_* template literal.
+  const config = getLogtoConfig();
+  const client = new LogtoClient(config);
 
   switch (action) {
     case 'sign-in':
       return client.handleSignIn({
-        redirectUri: `${process.env.NEXT_PUBLIC_APP_URL}/api/logto/sign-in-callback`,
+        redirectUri: `${config.baseUrl}/api/logto/sign-in-callback`,
         interactionMode: 'signIn',
       })(request);
 
