@@ -9,6 +9,11 @@ const inter = Inter({
   display: 'swap',
 });
 
+// This layout reads cookies (via requireAuth → next/headers), so it must never
+// be statically pre-rendered. force-dynamic propagates to all routes beneath
+// it, including the built-in /_not-found page, preventing the build-time crash.
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: 'Hiiragi — DashboardGo Portal',
   description: 'Interactive navigation console for self-hosted network platforms.',
