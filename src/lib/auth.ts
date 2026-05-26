@@ -1,6 +1,6 @@
 import { getLogtoContext } from '@logto/next/server-actions';
 import { redirect } from 'next/navigation';
-import { logtoConfig } from './logto.config';
+import { getLogtoConfig } from './logto.config';
 
 // Re-export so callers can type-annotate without reaching into @logto internals.
 export type { LogtoContext } from '@logto/next/server-actions';
@@ -21,7 +21,7 @@ export type { LogtoContext } from '@logto/next/server-actions';
  *   // ctx.claims.email — user e-mail (if email scope was requested)
  */
 export async function requireAuth() {
-  const ctx = await getLogtoContext(logtoConfig);
+  const ctx = await getLogtoContext(getLogtoConfig());
 
   if (!ctx.isAuthenticated) {
     // redirect() throws a Next.js-internal error (return type: never),
@@ -38,5 +38,5 @@ export async function requireAuth() {
  * without hard-gating access.
  */
 export async function getOptionalUser() {
-  return getLogtoContext(logtoConfig);
+  return getLogtoContext(getLogtoConfig());
 }
