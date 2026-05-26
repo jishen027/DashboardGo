@@ -9,7 +9,14 @@ export type ServiceStatus =
 
 export type LayoutDensity = 'compact' | 'medium' | 'comfortable';
 
-export type ActiveTab = 'dashboard' | 'config' | 'github';
+export type ActiveTab = 'dashboard' | 'config';
+
+export interface UserInfo {
+  sub: string;
+  name?: string;
+  email?: string;
+  picture?: string;
+}
 
 export type ToastType = 'success' | 'danger' | 'warning' | 'stone';
 

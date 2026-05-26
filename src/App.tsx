@@ -6,14 +6,17 @@ import { Footer } from '@/components/layout/Footer';
 import { Toast } from '@/components/layout/Toast';
 import { DashboardTab } from '@/tabs/DashboardTab';
 import { ConfigTab } from '@/tabs/ConfigTab';
-import { DeployTab } from '@/tabs/DeployTab';
 import { useToast } from '@/hooks/useToast';
 import { useLiveClock } from '@/hooks/useLiveClock';
 import { useSimulatedMetrics } from '@/hooks/useSimulatedMetrics';
 import { useDashyConfig } from '@/hooks/useDashyConfig';
-import type { ActiveTab } from '@/types';
+import type { ActiveTab, UserInfo } from '@/types';
 
-export default function App() {
+interface AppProps {
+  user: UserInfo;
+}
+
+export default function App({ user }: AppProps) {
   const [activeTab, setActiveTab] = useState<ActiveTab>('dashboard');
   const [darkMode, setDarkMode] = useState(false);
 
@@ -50,6 +53,7 @@ export default function App() {
         config={config}
         activeTab={activeTab}
         darkMode={darkMode}
+        user={user}
         onTabChange={(tab) => {
           setActiveTab(tab);
         }}
@@ -90,8 +94,6 @@ export default function App() {
             onDownload={handleDownloadConfig}
           />
         )}
-
-        {activeTab === 'github' && <DeployTab />}
       </main>
 
       <Footer />

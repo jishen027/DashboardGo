@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
+import { requireAuth } from '@/lib/auth';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -13,10 +14,18 @@ export const metadata: Metadata = {
   description: 'Interactive navigation console for self-hosted network platforms.',
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+// RootLayout is a Server Component. requireAuth() runs on the server and calls
+// Next.js redirect() before any HTML is streamed — there is no client-side flash.
+// Route Handlers (app/api/**) are NOT processed by layouts, so the Logto auth
+// routes (/api/logto/*) are never gated by this call.
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  await requireAuth();
+
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.variable} font-sans antialiased`} suppressHydrationWarning>{children}</body>
+      <body className={`${inter.variable} font-sans antialiased`} suppressHydrationWarning>
+        {children}
+      </body>
     </html>
   );
 }

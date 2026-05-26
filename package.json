@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@codemirror/lang-json": "^6.0.2",
+    "@logto/next": "^4.2.10",
     "@uiw/codemirror-theme-vscode": "^4.25.9",
     "@uiw/react-codemirror": "^4.25.9",
     "lucide-react": "^0.513.0",
