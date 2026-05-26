@@ -30,7 +30,27 @@ jobs:
           # Remove token from remote URL immediately after fetch
           git remote set-url origin "https://github.com/${{ github.repository }}.git"
 
-      # ── 2. Docker Buildx ──────────────────────────────────────────────────────
+      # ── 2. Runtime environment ───────────────────────────────────────────────
+      # Write secrets to .env AFTER checkout (git clean -ffd would delete it).
+      # docker-compose.yml loads this file via env_file so the container gets
+      # all five Logto vars at runtime without baking secrets into the image.
+      - name: Write runtime environment
+        env:
+          LOGTO_ENDPOINT: ${{ secrets.LOGTO_ENDPOINT }}
+          LOGTO_APP_ID: ${{ secrets.LOGTO_APP_ID }}
+          LOGTO_APP_SECRET: ${{ secrets.LOGTO_APP_SECRET }}
+          NEXT_PUBLIC_APP_URL: ${{ secrets.NEXT_PUBLIC_APP_URL }}
+          LOGTO_COOKIE_SECRET: ${{ secrets.LOGTO_COOKIE_SECRET }}
+        run: |
+          {
+            echo "LOGTO_ENDPOINT=$LOGTO_ENDPOINT"
+            echo "LOGTO_APP_ID=$LOGTO_APP_ID"
+            echo "LOGTO_APP_SECRET=$LOGTO_APP_SECRET"
+            echo "NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL"
+            echo "LOGTO_COOKIE_SECRET=$LOGTO_COOKIE_SECRET"
+          } > .env
+
+      # ── 3. Docker Buildx ──────────────────────────────────────────────────────
       - name: Set up Docker Buildx
         run: |
           if ! docker buildx inspect dashboardgo-builder > /dev/null 2>&1; then
@@ -42,7 +62,7 @@ jobs:
           docker buildx use dashboardgo-builder
           docker buildx inspect --bootstrap
 
-      # ── 3. Build ──────────────────────────────────────────────────────────────
+      # ── 4. Build ──────────────────────────────────────────────────────────────
       - name: Build image
         run: |
           mkdir -p /tmp/.buildx-cache
@@ -58,13 +78,13 @@ jobs:
           rm -rf /tmp/.buildx-cache
           mv /tmp/.buildx-cache-new /tmp/.buildx-cache
 
-      # ── 4. Deploy ─────────────────────────────────────────────────────────────
+      # ── 5. Deploy ─────────────────────────────────────────────────────────────
       - name: Deploy container
         run: |
           docker compose down --remove-orphans --timeout 10
           docker compose up -d
 
-      # ── 5. Prune old images ───────────────────────────────────────────────────
+      # ── 6. Prune old images ───────────────────────────────────────────────────
       - name: Remove dangling images
         if: always()
         run: docker image prune -f

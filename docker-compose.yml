@@ -9,6 +9,8 @@ services:
       # Named volume — Docker initialises it from the image's /app/config/ on
       # first creation and persists all subsequent edits across restarts/redeploys.
       - dashboardgo_config:/app/config
+    env_file:
+      - .env
     environment:
       - NODE_ENV=production
       - NEXT_TELEMETRY_DISABLED=1
